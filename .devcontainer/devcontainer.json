@@ -1,0 +1,16 @@
+{
+    "name": "Stacks Clarity Cloud",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "hirosystems.clarity-lsp"
+            ]
+        }
+    },
+    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y wget && wget -nv https://github.com/stx-labs/clarinet/releases/latest/download/clarinet-linux-x64-glibc.tar.gz -O clarinet-linux-x64.tar.gz && tar -xf clarinet-linux-x64.tar.gz && chmod +x ./clarinet && sudo mv ./clarinet /usr/local/bin && rm clarinet-linux-x64.tar.gz",
+    "remoteUser": "vscode"
+}
