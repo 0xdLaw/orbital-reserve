@@ -1,0 +1,5 @@
+(define-public (claim-yield-payout) (ok true))
+(define-public (deposit-btc (amount uint)) (ok true))
+(define-public (request-epoch-withdrawal) (ok true))
+(define-read-only (get-unclaimed-rewards (user principal)) (ok u5000))
+(define-read-only (get-balance (user principal)) (ok u10000))
