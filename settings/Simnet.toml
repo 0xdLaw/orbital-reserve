@@ -1,0 +1,10 @@
+[network]
+name = "simnet"
+
+[accounts.deployer]
+mnemonic = "fetch neptune continuous ahead layer unique card source setup zero draft turtle"
+balance = 100000000000000
+
+[accounts.wallet_1]
+mnemonic = "rebel direct visual build dynamic long execute asset direct drop shock crisp"
+balance = 100000000000000
