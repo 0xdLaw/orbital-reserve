@@ -1,13 +1,5 @@
-(define-public (claim-supply-rewards)
-    (if false
-        (err u0)
-        (ok true)))
-(define-public (emergency-withdraw-collateral)
-    (if false
-        (err u0)
-        (ok true)))
-(define-public (transfer-to-vault (vault principal))
-    (if false
-        (err u0)
-        (begin (print vault) (ok true))))
-(define-read-only (get-unclaimed-rewards (user principal)) (begin (print user) (ok u3000)))
+(define-data-var mock-state uint u0)
+(define-public (claim-supply-rewards) (begin (var-set mock-state (+ (var-get mock-state) u1)) (ok true)))
+(define-public (emergency-withdraw-collateral) (begin (var-set mock-state (+ (var-get mock-state) u1)) (ok true)))
+(define-public (transfer-to-vault (vault principal)) (begin (var-set mock-state (+ (var-get mock-state) u1)) (ok (is-eq vault tx-sender))))
+(define-read-only (get-unclaimed-rewards (user principal)) (ok (if (is-eq user tx-sender) u3000 u3000)))

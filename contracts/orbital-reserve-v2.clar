@@ -13,6 +13,7 @@
 (define-constant EFFICIENCY-RATIO u20)            
 (define-constant SLIPPAGE-TOLERANCE-BPS u200)     
 
+(define-constant ASIGNA-VAULT tx-sender)          
 (define-constant HERMETICA-MOCK .hermetica-mock)
 (define-constant ZEST-MOCK .zest-mock)
 (define-constant BITFLOW-MOCK .bitflow-mock)
@@ -24,7 +25,7 @@
 (define-map timelock-queue (buff 32) uint)
 
 (define-private (is-governance-auth)
-    (is-eq contract-caller tx-sender)
+    (is-eq contract-caller ASIGNA-VAULT)
 )
 
 (define-private (is-system-operational)
@@ -38,7 +39,7 @@
     )
 )
 
-(define-private (is-harvest-efficient (projected-gas-fee uint))
+(define-public (is-harvest-efficient (projected-gas-fee uint))
     (let
         (
             (unclaimed-zest (unwrap-panic (contract-call? ZEST-MOCK get-unclaimed-rewards tx-sender)))
@@ -46,10 +47,7 @@
             (total-accrued-yield (+ unclaimed-zest unclaimed-hermetica))
             (efficiency-floor (* projected-gas-fee EFFICIENCY-RATIO))
         )
-        (if (>= total-accrued-yield efficiency-floor)
-            (ok true)
-            (ok false)
-        )
+        (>= total-accrued-yield efficiency-floor)
     )
 )
 
@@ -57,12 +55,12 @@
     (begin
         (asserts! (is-system-operational) ERR-CIRCUIT-BREAKER-OPEN)
         (asserts! (is-eq (var-get active-harvest-stage) u0) ERR-INVALID-STAGE-SEQUENCE)
-        (asserts! (is-eq (unwrap-panic (is-harvest-efficient estimated-gas)) true) ERR-VALUE-GATE-FAILED)
+        (asserts! (is-harvest-efficient estimated-gas) ERR-VALUE-GATE-FAILED)
         
         (try! (contract-call? ZEST-MOCK claim-supply-rewards))
         (try! (contract-call? HERMETICA-MOCK claim-yield-payout))
         
-        (var-set buffer-liquid-usdh (unwrap-panic (contract-call? HERMETICA-MOCK get-balance (as-contract tx-sender))))
+        (var-set buffer-liquid-usdh (try! (contract-call? HERMETICA-MOCK get-balance (as-contract tx-sender))))
         (var-set active-harvest-stage u1) 
         
         (ok true)
@@ -104,7 +102,7 @@
         (asserts! (is-eq (var-get circuit-breaker-open) true) ERR-CIRCUIT-BREAKER-OPEN)
         (asserts! (is-governance-auth) ERR-UNAUTHORIZED)
         (try! (contract-call? ZEST-MOCK emergency-withdraw-collateral))
-        (as-contract (try! (contract-call? ZEST-MOCK transfer-to-vault tx-sender)))
+        (as-contract (try! (contract-call? ZEST-MOCK transfer-to-vault ASIGNA-VAULT)))
         (ok true)
     )
 )
