@@ -54,10 +54,10 @@
         (asserts! (is-eq (var-get active-harvest-stage) u0) ERR-INVALID-STAGE-SEQUENCE)
         (asserts! (is-harvest-efficient estimated-gas) ERR-VALUE-GATE-FAILED)
         
-        (try! (contract-call? .zest-mock claim-supply-rewards))
-        (try! (contract-call? .hermetica-mock claim-yield-payout))
+        (unwrap-panic (contract-call? .zest-mock claim-supply-rewards))
+        (unwrap-panic (contract-call? .hermetica-mock claim-yield-payout))
         
-        (var-set buffer-liquid-usdh (try! (contract-call? .hermetica-mock get-balance (as-contract tx-sender))))
+        (var-set buffer-liquid-usdh (unwrap-panic (contract-call? .hermetica-mock get-balance (as-contract tx-sender))))
         (var-set active-harvest-stage u1) 
         
         (ok true)
@@ -76,7 +76,7 @@
             )
             
             (asserts! (>= swapped-btc min-btc-expected) ERR-SLIPPAGE-EXCEEDED)
-            (try! (contract-call? .hermetica-mock deposit-btc swapped-btc))
+            (unwrap-panic (contract-call? .hermetica-mock deposit-btc swapped-btc))
             
             (var-set buffer-liquid-usdh u0)
             (var-set active-harvest-stage u0)
@@ -98,8 +98,8 @@
     (begin
         (asserts! (is-eq (var-get circuit-breaker-open) true) ERR-CIRCUIT-BREAKER-OPEN)
         (asserts! (is-governance-auth) ERR-UNAUTHORIZED)
-        (try! (contract-call? .zest-mock emergency-withdraw-collateral))
-        (as-contract (try! (contract-call? .zest-mock transfer-to-vault ASIGNA-VAULT)))
+        (unwrap-panic (contract-call? .zest-mock emergency-withdraw-collateral))
+        (as-contract (unwrap-panic (contract-call? .zest-mock transfer-to-vault ASIGNA-VAULT)))
         (ok true)
     )
 )

@@ -13,13 +13,15 @@
 )
 
 (define-read-only (get-unclaimed-rewards (user principal))
-    (let ((unused-shush (is-eq user tx-sender)))
+    (begin 
+        (is-eq user tx-sender)
         (ok u5000)
     )
 )
 
 (define-read-only (get-balance (user principal))
-    (let ((unused-shush (is-eq user tx-sender)))
+    (begin 
+        (is-eq user tx-sender)
         (ok u10000)
     )
 )

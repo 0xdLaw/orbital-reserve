@@ -16,7 +16,8 @@
 )
 
 (define-read-only (get-unclaimed-rewards (user principal))
-    (let ((unused-shush (is-eq user tx-sender)))
+    (begin 
+        (is-eq user tx-sender)
         (ok u3000)
     )
 )
