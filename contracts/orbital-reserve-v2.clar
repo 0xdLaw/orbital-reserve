@@ -4,7 +4,6 @@
 
 (define-constant ERR_UNAUTHORIZED (err u1001))
 (define-constant ERR_VALUE_GATE_FAILED (err u1002))
-(define-constant ERR_TIMELOCK_ACTIVE (err u1003))
 (define-constant ERR_SLIPPAGE_EXCEEDED (err u1004))
 (define-constant ERR_CIRCUIT_BREAKER_OPEN (err u1005))
 (define-constant ERR_INVALID_STAGE_SEQUENCE (err u1006))
