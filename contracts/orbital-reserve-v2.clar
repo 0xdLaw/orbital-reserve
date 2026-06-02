@@ -14,9 +14,6 @@
 (define-constant SLIPPAGE-TOLERANCE-BPS u200)     
 
 (define-constant ASIGNA-VAULT tx-sender)          
-(define-constant HERMETICA-MOCK .hermetica-mock)
-(define-constant ZEST-MOCK .zest-mock)
-(define-constant BITFLOW-MOCK .bitflow-mock)
 
 (define-data-var circuit-breaker-open bool false)
 (define-data-var active-harvest-stage uint u0)   
@@ -39,11 +36,11 @@
     )
 )
 
-(define-public (is-harvest-efficient (projected-gas-fee uint))
+(define-read-only (is-harvest-efficient (projected-gas-fee uint))
     (let
         (
-            (unclaimed-zest (unwrap-panic (contract-call? ZEST-MOCK get-unclaimed-rewards tx-sender)))
-            (unclaimed-hermetica (unwrap-panic (contract-call? HERMETICA-MOCK get-unclaimed-rewards tx-sender)))
+            (unclaimed-zest (unwrap-panic (contract-call? .zest-mock get-unclaimed-rewards tx-sender)))
+            (unclaimed-hermetica (unwrap-panic (contract-call? .hermetica-mock get-unclaimed-rewards tx-sender)))
             (total-accrued-yield (+ unclaimed-zest unclaimed-hermetica))
             (efficiency-floor (* projected-gas-fee EFFICIENCY-RATIO))
         )
@@ -57,10 +54,10 @@
         (asserts! (is-eq (var-get active-harvest-stage) u0) ERR-INVALID-STAGE-SEQUENCE)
         (asserts! (is-harvest-efficient estimated-gas) ERR-VALUE-GATE-FAILED)
         
-        (try! (contract-call? ZEST-MOCK claim-supply-rewards))
-        (try! (contract-call? HERMETICA-MOCK claim-yield-payout))
+        (try! (contract-call? .zest-mock claim-supply-rewards))
+        (try! (contract-call? .hermetica-mock claim-yield-payout))
         
-        (var-set buffer-liquid-usdh (try! (contract-call? HERMETICA-MOCK get-balance (as-contract tx-sender))))
+        (var-set buffer-liquid-usdh (try! (contract-call? .hermetica-mock get-balance (as-contract tx-sender))))
         (var-set active-harvest-stage u1) 
         
         (ok true)
@@ -75,11 +72,11 @@
         (let
             (
                 (usdh-to-swap (var-get buffer-liquid-usdh))
-                (swapped-btc (unwrap! (contract-call? BITFLOW-MOCK swap-rewards-for-btc usdh-to-swap) ERR-SLIPPAGE-EXCEEDED))
+                (swapped-btc (unwrap! (contract-call? .bitflow-mock swap-rewards-for-btc usdh-to-swap) ERR-SLIPPAGE-EXCEEDED))
             )
             
             (asserts! (>= swapped-btc min-btc-expected) ERR-SLIPPAGE-EXCEEDED)
-            (try! (contract-call? HERMETICA-MOCK deposit-btc swapped-btc))
+            (try! (contract-call? .hermetica-mock deposit-btc swapped-btc))
             
             (var-set buffer-liquid-usdh u0)
             (var-set active-harvest-stage u0)
@@ -101,8 +98,8 @@
     (begin
         (asserts! (is-eq (var-get circuit-breaker-open) true) ERR-CIRCUIT-BREAKER-OPEN)
         (asserts! (is-governance-auth) ERR-UNAUTHORIZED)
-        (try! (contract-call? ZEST-MOCK emergency-withdraw-collateral))
-        (as-contract (try! (contract-call? ZEST-MOCK transfer-to-vault ASIGNA-VAULT)))
+        (try! (contract-call? .zest-mock emergency-withdraw-collateral))
+        (as-contract (try! (contract-call? .zest-mock transfer-to-vault ASIGNA-VAULT)))
         (ok true)
     )
 )
