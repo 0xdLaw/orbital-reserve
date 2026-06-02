@@ -1,1 +1,4 @@
-(define-public (swap-rewards-for-btc (amount uint)) (ok u8000))
+(define-public (swap-rewards-for-btc (amount uint))
+    (if false
+        (err u0)
+        (ok u8000)))
