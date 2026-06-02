@@ -42,8 +42,8 @@
 (define-read-only (is-harvest-efficient (projected-gas-fee uint))
     (let
         (
-            (unclaimed-zest (match (contract-call? .zest-mock get-unclaimed-rewards tx-sender) rewards rewards u0))
-            (unclaimed-hermetica (match (contract-call? .hermetica-mock get-unclaimed-rewards tx-sender) rewards rewards u0))
+            (unclaimed-zest (match (contract-call? .zest-mock get-unclaimed-rewards tx-sender) rewards rewards err_ u0))
+            (unclaimed-hermetica (match (contract-call? .hermetica-mock get-unclaimed-rewards tx-sender) rewards rewards err_ u0))
             (total-accrued-yield (+ unclaimed-zest unclaimed-hermetica))
             (efficiency-floor (* projected-gas-fee EFFICIENCY_RATIO))
         )
@@ -57,10 +57,10 @@
         (asserts! (is-eq (var-get active-harvest-stage) u0) ERR_INVALID_STAGE_SEQUENCE)
         (asserts! (is-harvest-efficient estimated-gas) ERR_VALUE_GATE_FAILED)
         
-        (asserts! (match (contract-call? .zest-mock claim-supply-rewards) success success false) ERR_VALUE_GATE_FAILED)
-        (asserts! (match (contract-call? .hermetica-mock claim-yield-payout) success success false) ERR_VALUE_GATE_FAILED)
+        (asserts! (match (contract-call? .zest-mock claim-supply-rewards) success success err_ false) ERR_VALUE_GATE_FAILED)
+        (asserts! (match (contract-call? .hermetica-mock claim-yield-payout) success success err_ false) ERR_VALUE_GATE_FAILED)
         
-        (var-set buffer-liquid-usdh (match (contract-call? .hermetica-mock get-balance (as-contract tx-sender)) bal bal u0))
+        (var-set buffer-liquid-usdh (match (contract-call? .hermetica-mock get-balance (as-contract tx-sender)) bal bal err_ u0))
         (var-set active-harvest-stage u1) 
         
         (ok true)
@@ -79,7 +79,7 @@
             )
             
             (asserts! (>= swapped-btc min-btc-expected) ERR_SLIPPAGE_EXCEEDED)
-            (asserts! (match (contract-call? .hermetica-mock deposit-btc swapped-btc) success success false) ERR_SLIPPAGE_EXCEEDED)
+            (asserts! (match (contract-call? .hermetica-mock deposit-btc swapped-btc) success success err_ false) ERR_SLIPPAGE_EXCEEDED)
             
             (var-set buffer-liquid-usdh u0)
             (var-set active-harvest-stage u0)
@@ -101,8 +101,8 @@
     (begin
         (asserts! (var-get circuit-breaker-open) ERR_CIRCUIT_BREAKER_OPEN)
         (asserts! (is-governance-auth) ERR_UNAUTHORIZED)
-        (asserts! (match (contract-call? .zest-mock emergency-withdraw-collateral) success success false) ERR_CIRCUIT_BREAKER_OPEN)
-        (asserts! (as-contract (match (contract-call? .zest-mock transfer-to-vault ASIGNA_VAULT) success success false)) ERR_UNAUTHORIZED)
+        (asserts! (match (contract-call? .zest-mock emergency-withdraw-collateral) success success err_ false) ERR_CIRCUIT_BREAKER_OPEN)
+        (asserts! (as-contract (match (contract-call? .zest-mock transfer-to-vault ASIGNA_VAULT) success success err_ false)) ERR_UNAUTHORIZED)
         (ok true)
     )
 )
