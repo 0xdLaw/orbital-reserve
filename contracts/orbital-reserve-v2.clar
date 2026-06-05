@@ -39,9 +39,11 @@
 )
 
 (define-read-only (is-harvest-efficient (projected-gas-fee uint))
-    (if (var-get circuit-breaker-open)
-        false
-    
+    (if (and
+            (not (var-get circuit-breaker-open))
+                 (is-eq tx-sender ASIGNA_VAULT)
+    )
+
      (let 
         (
             (unclaimed-zest (unwrap! (contract-call? .zest-mock get-unclaimed-rewards tx-sender) false))
@@ -49,8 +51,9 @@
             (total-accrued-yield (+ unclaimed-zest unclaimed-hermetica))
             (efficiency-floor (* projected-gas-fee EFFICIENCY_RATIO))
         )
-        (>= total-accrued-yield efficiency-floor)
-     )
+        (>= total-accrued-yield efficiency-floor)      
+    )
+    false
     )
 )
 
