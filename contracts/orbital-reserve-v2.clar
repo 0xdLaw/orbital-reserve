@@ -39,7 +39,10 @@
 )
 
 (define-read-only (is-harvest-efficient (projected-gas-fee uint))
-    (let
+    (if (var-get circuit-breaker-open)
+        false
+    
+     (let 
         (
             (unclaimed-zest (unwrap! (contract-call? .zest-mock get-unclaimed-rewards tx-sender) false))
             (unclaimed-hermetica (unwrap! (contract-call? .hermetica-mock get-unclaimed-rewards tx-sender) false))
@@ -47,6 +50,7 @@
             (efficiency-floor (* projected-gas-fee EFFICIENCY_RATIO))
         )
         (>= total-accrued-yield efficiency-floor)
+     )
     )
 )
 
@@ -61,7 +65,6 @@
         
         (var-set buffer-liquid-usdh (unwrap! (contract-call? .hermetica-mock get-balance (as-contract tx-sender)) ERR_VALUE_GATE_FAILED))
         (var-set active-harvest-stage u1) 
-        
         (ok true)
     )
 )
