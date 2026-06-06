@@ -53,7 +53,7 @@
         )
         (>= total-accrued-yield efficiency-floor)      
     )
-    false
+        false
     )
 )
 
@@ -98,6 +98,14 @@
     (begin
         (asserts! (is-governance-auth) ERR_UNAUTHORIZED)
         (var-set circuit-breaker-open true)
+        (ok true)
+    )
+)
+
+(define-public (reset-circuit-breaker)
+    (begin
+        (asserts! (is-governance-auth) ERR_UNAUTHORIZED)
+        (var-set circuit-breaker-open false)
         (ok true)
     )
 )

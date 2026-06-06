@@ -1,0 +1,14 @@
+#V2
+(contract-call? .orbital-reserve-v2 emergency-circuit-breaker)
+(contract-call? .orbital-reserve-v2 is-harvest-efficient u100)
+clarinet check
+(contract-call? .orbital-reserve-v2 emergency-circuit-breaker)
+(contract-call? .orbital-reserve-v2 is-harvest-efficient)
+(contract-call? .orbital-reserve-v2 is-harvest-efficient u100)
+(contract-call? .orbital-reserve-v2 emergency-circuit-breaker)
+(contract-call? .orbital-reserve-v2 harvest-yields u50000000)\n
+::exit
+exit
+::exit
+::help
+::reload
