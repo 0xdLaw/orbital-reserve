@@ -66,8 +66,8 @@
         (unwrap! (contract-call? .zest-mock claim-supply-rewards) ERR_VALUE_GATE_FAILED)
         (unwrap! (contract-call? .hermetica-mock claim-yield-payout) ERR_VALUE_GATE_FAILED)
         
-        (var-set buffer-liquid-usdh (unwrap! (contract-call? .hermetica-mock get-balance (as-contract tx-sender)) ERR_VALUE_GATE_FAILED))
-        (var-set active-harvest-stage u1) 
+        (var-set buffer-liquid-usdh (unwrap! (contract-call? .hermetica-mock get-balance tx-sender) ERR_VALUE_GATE_FAILED))
+        (var-set active-harvest-stage u1)
         (ok true)
     )
 )
@@ -85,8 +85,8 @@
             
             (asserts! (>= swapped-btc min-btc-expected) ERR_SLIPPAGE_EXCEEDED)
             (unwrap! (contract-call? .hermetica-mock deposit-btc swapped-btc) ERR_SLIPPAGE_EXCEEDED)
-            
-            (var-set buffer-liquid-usdh u0)
+
+            (var-set buffer-liquid-usdh u0) 
             (var-set active-harvest-stage u0)
             
             (ok swapped-btc)
